@@ -1,15 +1,8 @@
 require "date"
 
 class Todo < ActiveRecord::Base
-  
   def due_today?
     Date.today == due_date
-  end
-
-  def to_displayable_string
-    status = completed ? "[X]" : "[ ]"
-    date = due_today? ? nil : due_date
-    "#{id} #{status} #{todo_text} #{date}"
   end
 
   def self.overdue
@@ -17,11 +10,17 @@ class Todo < ActiveRecord::Base
   end
 
   def self.due_today
-    all.where(due_date: Date.today)
+    all.where("due_date=?", Date.today)
   end
 
   def self.due_later
     all.where("due_date> ?", Date.today)
+  end
+
+  def to_displayable_string
+    status = completed ? "[X]" : "[ ]"
+    date = due_today? ? nil : due_date
+    "#{id} #{status} #{todo_text} #{date}"
   end
 
   def self.show_list
@@ -45,8 +44,8 @@ class Todo < ActiveRecord::Base
 
   def self.mark_as_complete!(todo_id)
     todo = Todo.find(todo_id)
-    todo.completed = true
+    todo.completed = "true"
     todo.save
-    Todo.find(todo_id)
+    todo
   end
 end
